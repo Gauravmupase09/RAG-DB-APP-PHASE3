@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+venv/
+
+# Environment
+.env
+
+# HuggingFace / Cache
+~/.cache/
+cache/
+model_cache/
+
+# Local data
+backend/data/uploads/
+backend/data/processed/
+backend/data/vector_store/
