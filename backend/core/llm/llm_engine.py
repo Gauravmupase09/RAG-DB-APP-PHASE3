@@ -1,8 +1,8 @@
-# backend/core/rag/llm_engine.py
+# backend/core/llm/llm_engine.py
 
 import os
 import langchain
-from typing import List, Dict, Generator, Optional
+from typing import List, Dict, Optional
 
 # 🩹 Compatibility patch for LangChain integrations (fix missing attrs)
 for attr, default in {
@@ -53,24 +53,25 @@ def get_llm(
 
 def build_answer_prompt() -> PromptTemplate:
     """
-    Builds a single, flexible prompt template that works for BOTH:
+    Builds a single, flexible prompt template that works for:
       - General conversation / Q&A
       - Document-grounded RAG answers
+      - DB based answers
 
     `mode` controls behavior:
       - "general"  → no retrieved document chunks, maybe some chat history
       - "rag"      → answer grounded in provided document context
+      - "DB"       → answer grounded in provided DB
     """
     template = """
-You are a helpful AI assistant in a *Document Q&A chat application*.
+You are a helpful AI assistant in a *multi-capability chat application*.
 
-You operate in one of two modes:
+You operate in one of three modes:
 
 1) MODE = "general"
-   - The user is asking a normal question that does NOT require
-     reading uploaded documents.
-   - Use the conversation context if provided, plus your own knowledge.
-   - You do NOT mention documents unless the user explicitly does.
+   - Normal conversational or general knowledge question
+   - No documents, no database
+   - Use conversation context if provided
 
 2) MODE = "rag"
    - The user’s question MUST be answered using the provided document context.
@@ -79,6 +80,13 @@ You operate in one of two modes:
    - Treat the context as the primary source of truth.
    - If the context doesn’t contain enough information, say so and answer
      as best you can, but DO NOT invent very specific document details.
+
+3) MODE = "db"
+   - Answer MUST be based ONLY on the database query result rows
+   - Explain what the data shows in clear human language
+   - Do NOT invent rows or values
+   - If rows are empty, clearly say no results were found
+   - Do NOT assume anything beyond the given data
 
 GENERAL GUIDELINES (for BOTH modes):
 - Give clear, well-structured, and descriptive answers.
@@ -230,5 +238,61 @@ def generate_rag_answer(
             "query": query,
             "response": f"⚠ Error generating response: {str(e)}",
             "used_chunks": len(context_chunks),
+            "model": model_name,
+        }
+    
+
+# ======================================================
+# 🗄️ DATABASE ANSWER (DB-GROUNDED)
+#   - Used by run_db_generation() in db_executor.py
+# ======================================================
+
+def generate_db_answer(
+    query: str,
+    rows: List[Dict],
+    sql: str,
+    db_type: str,
+    memory_text: Optional[str] = None,
+    model_name: str = "gemini-2.5-flash",
+) -> Dict:
+    """
+    Generate a natural-language explanation of DB query results.
+    Used by run_db_generation().
+    """
+    try:
+        logger.info(f"🤖 [DB] Query='{query}' | Rows={len(rows)}")
+
+        context_parts = []
+
+        if memory_text:
+            context_parts.append("Conversation History:\n" + memory_text)
+
+        context_parts.append(f"Database Type: {db_type}")
+        context_parts.append(f"Executed SQL:\n{sql}")
+        context_parts.append(f"Query Result Rows:\n{rows}")
+
+        context = "\n\n".join(context_parts)
+
+        chain = _build_chain(model_name=model_name, temperature=0.3)
+
+        result = chain.invoke(
+            {
+                "mode": "db",
+                "context": context,
+                "question": query,
+            }
+        )
+
+        return {
+            "query": query,
+            "response": getattr(result, "content", str(result)),
+            "model": model_name,
+        }
+
+    except Exception as e:
+        logger.exception("❌ DB answer failed")
+        return {
+            "query": query,
+            "response": f"Error explaining database results: {e}",
             "model": model_name,
         }

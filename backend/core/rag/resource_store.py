@@ -1,3 +1,5 @@
+# backend/core/rag/resource_store.py
+
 class ResourceStore:
     """
     A lightweight global container that holds shared resources,

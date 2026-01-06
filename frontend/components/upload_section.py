@@ -1,3 +1,5 @@
+# frontend/components/upload_section.py
+
 import streamlit as st
 from utils.api_client import upload_file, process_file, list_documents
 

@@ -1,3 +1,5 @@
+# backend/core/doc_processing_unit/text_extractor.py
+
 import pdfplumber
 from docx import Document
 from pathlib import Path

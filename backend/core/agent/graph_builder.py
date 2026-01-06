@@ -1,4 +1,4 @@
-# backend/core/rag/agent/graph_builder.py
+# backend/core/agent/graph_builder.py
 
 """
 This file builds the complete Agentic RAG workflow graph.
@@ -17,15 +17,15 @@ The graph always ends in finalize_node, which returns
 state["final_output"] — consumed by FastAPI /query route.
 """
 
-from langgraph.graph import StateGraph, START, END
+from langgraph.graph import StateGraph, END
 
 # --- State model ---
-from backend.core.rag.agent.graph_state import AgentState
+from backend.core.agent.graph_state import AgentState
 
 # --- Nodes ---
-from backend.core.rag.agent.nodes.assistant_node import assistant_node
-from backend.core.rag.agent.nodes.tool_node import tool_node
-from backend.core.rag.agent.nodes.finalize_node import finalize_node
+from backend.core.agent.nodes.assistant_node import assistant_node
+from backend.core.agent.nodes.tool_node import tool_node
+from backend.core.agent.nodes.finalize_node import finalize_node
 
 
 # =====================================================================

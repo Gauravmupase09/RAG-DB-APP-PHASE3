@@ -1,4 +1,4 @@
-# backend/core/rag/agent/rag_tool.py
+# backend/core/agent/tools/rag_tool.py
 
 from langchain_core.tools import tool
 from backend.core.rag.rag_pipeline import run_rag_retrieval

@@ -1,3 +1,5 @@
+# backend/core/doc_processing_unit/model_manager.py
+
 from typing import Optional
 from sentence_transformers import SentenceTransformer
 from backend.utils.config import EMBEDDING_MODEL

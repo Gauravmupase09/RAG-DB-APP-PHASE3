@@ -6,10 +6,10 @@ from backend.utils.logger import logger
 # Import core RAG components
 from backend.core.rag.retriever import retrieve_top_k_chunks
 from backend.core.rag.citation_handler import prepare_context_and_citations, format_citations_for_display
-from backend.core.rag.llm_engine import generate_rag_answer
+from backend.core.llm.llm_engine import generate_rag_answer
 
 # Memory
-from backend.core.rag.session_memory import add_to_session_memory, get_session_memory
+from backend.core.memory.session_memory import add_to_session_memory, get_session_memory
 
 
 # =======================================================================
@@ -77,7 +77,7 @@ async def run_rag_generation(session_id: str, query: str, chunks: List[str], cit
 
     
     if memory and memory[-1]["role"] == "user":
-        memory_for_context = memory[:-1]  # OPTION A fix
+        memory_for_context = memory[:-1]
     else:
         memory_for_context = memory
 

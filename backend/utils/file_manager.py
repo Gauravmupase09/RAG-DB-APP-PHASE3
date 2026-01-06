@@ -1,9 +1,10 @@
+# backend/utils/file_manager.py
+
 import shutil
-from pathlib import Path
 from typing import List
 from fastapi import UploadFile
 
-from backend.utils.config import UPLOAD_DIR, PROCESSED_DIR
+from backend.utils.config import UPLOAD_DIR, PROCESSED_DIR, DATA_DIR
 from backend.utils.logger import logger
 from backend.core.doc_processing_unit.qdrant_manager import delete_collection, get_collection_name
 
@@ -71,26 +72,43 @@ def validate_file_limit(session_id: str, max_files: int = 3) -> bool:
 
 def clear_session_data(session_id: str):
     """
-    Completely remove session data:
-    - Deletes uploaded + processed folders
-    - Deletes corresponding Qdrant vector collection
+    Fully reset a session:
+    - Deletes uploads
+    - Deletes processed files
+    - Deletes Qdrant collection
+    - Deletes persisted DB config
     """
-    logger.warning(f"🧹 Clearing session data for: {session_id}")
+    logger.warning(f"🧹 Clearing ALL session data for: {session_id}")
 
     session_upload_dir = UPLOAD_DIR / session_id
     session_processed_dir = PROCESSED_DIR / session_id
+    db_session_dir = DATA_DIR / "db" / session_id
 
-    # Remove local folders
+    # -------------------------------
+    # 1️⃣ Local folders
+    # -------------------------------
     for folder in [session_upload_dir, session_processed_dir]:
         if folder.exists():
             shutil.rmtree(folder)
             logger.info(f"🗑️ Removed folder: {folder}")
 
-    # Remove Qdrant collection
+    # -------------------------------
+    # 2️⃣ Qdrant collection
+    # -------------------------------
     try:
         delete_collection(get_collection_name(session_id))
         logger.info(f"🗑️ Deleted Qdrant collection for session: {session_id}")
     except Exception as e:
         logger.error(f"⚠️ Failed to delete Qdrant collection for {session_id}: {e}")
 
-    return {"status": "cleared", "session_id": session_id}
+    # -------------------------------
+    # 3️⃣ DB persisted config
+    # -------------------------------
+    if db_session_dir.exists():
+        shutil.rmtree(db_session_dir)
+        logger.info(f"🗑️ Removed DB config for session: {session_id}")
+
+    return {
+        "status": "cleared",
+        "session_id": session_id,
+    }

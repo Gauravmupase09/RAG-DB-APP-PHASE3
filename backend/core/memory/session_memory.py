@@ -1,3 +1,5 @@
+## backend/core/memory/session_memory.py
+
 # ============================================================
 # 🧠 In-Memory Sliding Window Conversation Memory
 # ============================================================

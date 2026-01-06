@@ -1,3 +1,5 @@
+# frontend/components/chat_section.py
+
 import streamlit as st
 from utils.api_client import send_query
 from components.citation_box import render_citation_box

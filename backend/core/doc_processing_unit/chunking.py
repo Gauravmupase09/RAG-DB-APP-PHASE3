@@ -1,4 +1,5 @@
-from pathlib import Path
+# backend/core/doc_processing_unit/chunking.py
+
 import json
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from backend.utils.config import PROCESSED_DIR, CHUNK_SIZE, CHUNK_OVERLAP

@@ -1,3 +1,5 @@
+# backend/core/rag/citation_handler.py
+
 from typing import List, Dict
 from urllib.parse import quote
 from backend.utils.logger import logger
@@ -43,13 +45,14 @@ def prepare_context_and_citations(retrieved_chunks: List[Dict]) -> Dict:
 
         # 🧾 Prepare clean citation info
         citation_entry = {
+            "type": "rag",
+            "rank": citation.get("rank"),
+            "score": citation.get("score"),
             "file_name": citation.get("file_name"),
             "file_path": citation.get("file_path"),
             "public_url": public_url,
             "chunk_index": citation.get("chunk_index"),
             "total_chunks_in_file": citation.get("total_chunks_in_file"),
-            "score": citation.get("score"),
-            "rank": citation.get("rank")
         }
         
         citations.append(citation_entry)

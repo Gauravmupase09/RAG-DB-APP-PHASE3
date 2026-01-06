@@ -1,3 +1,5 @@
+# backend/main.py
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
@@ -9,9 +11,9 @@ from backend.api.routes.upload import router as upload_router
 from backend.api.routes.process import router as process_router
 from backend.api.routes.list_docs import router as list_docs_router
 from backend.api.routes.reset_session import router as reset_router
+from backend.api.routes.db_connect import router as db_connect_router
+from backend.api.routes.db_schema import router as db_schema_router
 from backend.api.routes.query import router as query_router
-
-# from backend.api.routes.test_tool import router as test_tool_router
 
 # ✅ Core
 from backend.core.doc_processing_unit.model_manager import get_embedding_model
@@ -56,7 +58,12 @@ async def lifespan(app: FastAPI):
 # ============================================================
 # 🚀 App Initialization
 # ============================================================
-app = FastAPI(title="Chat With Doc App", version="2.0", lifespan=lifespan)
+app = FastAPI(
+    title="QueryVerse", 
+    description="Agentic AI system to query documents and databases using natural language.", 
+    version="3.0", 
+    lifespan=lifespan
+)
 
 
 # ============================================================
@@ -116,8 +123,9 @@ app.include_router(upload_router, prefix="/api", tags=["Upload"])
 app.include_router(process_router, prefix="/api", tags=["Process"])
 app.include_router(list_docs_router, prefix="/api", tags=["Documents List"])
 app.include_router(reset_router, prefix="/api", tags=["Reset Session"])
+app.include_router(db_connect_router, prefix="/api", tags=["Database Connection"])
+app.include_router(db_schema_router, prefix="/api", tags=["Database Schema"])
 app.include_router(query_router, prefix="/api", tags=["Query"])
-# app.include_router(test_tool_router, prefix="/api", tags=["Tool TEST"])
 
 # ============================================================
 # 💓 Health Check

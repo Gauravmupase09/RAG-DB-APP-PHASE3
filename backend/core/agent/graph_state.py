@@ -1,4 +1,4 @@
-# backend/core/rag/agent/graph_state.py
+# backend/core/agent/graph_state.py
 
 from typing import List, Optional, Dict, Any
 from langgraph.graph import MessagesState

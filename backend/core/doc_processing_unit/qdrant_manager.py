@@ -1,8 +1,10 @@
+# backend/core/doc_processing_unit/qdrant_manager.py
+
 import hashlib
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 
-from backend.utils.config import QDRANT_HOST, QDRANT_PORT, EMBEDDING_MODEL
+from backend.utils.config import QDRANT_HOST, QDRANT_PORT
 from backend.utils.logger import logger
 
 

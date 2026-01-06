@@ -1,3 +1,5 @@
+# frontend/utils/config.py
+
 # ============================
 # Streamlit Frontend Config
 # ============================

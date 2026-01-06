@@ -1,5 +1,6 @@
+# backend/core/doc_processing_unit/embedding_engine.py
+
 import json
-from pathlib import Path
 from typing import List, Dict
 
 from backend.utils.logger import logger
